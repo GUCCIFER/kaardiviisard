@@ -141,22 +141,25 @@ def getDataFields(ATR):
         # 9 if Tallinn Transportation Card, 8 if ISIC card
         # Currently hardcoded values for name and school
         if int(getBlockInfo(8)[-1]) == 8:
-            isicCardUID = getBlockInfo(8)[7:] + getBlockInfo(9)[:11]
+            isicCardPAN = getBlockInfo(8)[7:] + getBlockInfo(9)[:11]
+            isicCardNumber = getBlockInfo(8)[-1] + getBlockInfo(9)[:10]
             isicCardRecord = getBlockInfo(4)[7:] + getBlockInfo(5)[:8]
             isicCardCert = getBlockInfo(22)[3:] + getBlockInfo(24) + getBlockInfo(25)[:8]
-            isicCardNr = getBlockInfo(28)[:-2]
-            isicUser = getBlockInfo(32)[:6] + " " + getBlockInfo(33)[:4] + " " + getBlockInfo(34)[:8]
+            isicNumber = getBlockInfo(28)[:-2]
+            isicUser = getBlockInfo(32).split('.')[0] + " " + getBlockInfo(33).split('.')[0] + " " + getBlockInfo(34).split('.')[0]
             isicID = getBlockInfo(36)[:11]
             isicSchool = getBlockInfo(37)[:13]
             isicExpiration = getBlockInfo(40)[:10]
 
-            print("\n************ CARD INFO **************")
+            print("\n************ CARD INFO **************\n")
             print("Card type: ISIC CARD")
             print("External type record: " + isicCardRecord)
             print("Card ATR: " + toHexString(current_card_ATR))
-            print("UID: " + isicCardUID)
+            print("Card UID: " + toHexString(send([0xFF, 0xCA, 0x00, 0x00, 0x00])))
+            print("Card Number: " + isicCardNumber)
+            print("Card PAN: " + isicCardPAN[:-1])
             print("Cert: " + isicCardCert)
-            print("Card number: " + isicCardNr)
+            print("ISIC number: " + isicNumber)
             print("User and DoB: " + isicUser)
             print("User ID: " + isicID)
             print("School: " + isicSchool)
@@ -166,27 +169,33 @@ def getDataFields(ATR):
                 print(value + ": " + keysused[value])
 
         elif int(getBlockInfo(8)[15]) == 9:
-            tallinnCardUID = getBlockInfo(8)[7:] + getBlockInfo(9)[:11]
+            tallinnCardPAN = getBlockInfo(8)[7:] + getBlockInfo(9)[:11]
+            tallinnCardNumber = getBlockInfo(8)[-1] + getBlockInfo(9)[:10]
             tallinnCardRecord = getBlockInfo(4)[7:] + getBlockInfo(5)[:8]
             tallinnCardCert = getBlockInfo(22) + getBlockInfo(24) + getBlockInfo(25)[:5]
 
-            print("\n************ CARD INFO **************")
+            print("\n************ CARD INFO **************\n")
             print("Card type: Tallinn Public Transportation Card")
             print("External type record: " + tallinnCardRecord)
             print("Card ATR: " + toHexString(current_card_ATR))
-            print("UID: " + tallinnCardUID)
+            print("Card UID: " + toHexString(send([0xFF, 0xCA, 0x00, 0x00, 0x00])))
+            print("Card Number: " + tallinnCardNumber)
+            print("Card PAN: " + tallinnCardPAN[:-1])
             print("Cert: " + tallinnCardCert)
+            for value in keysused:
+                print(value + ": " + keysused[value])
         else:
             print("Card type unknown")
     elif ATR == UltralightC_ATR:
-        tartuCardUID = getPage(12)[11:] + getPage(16)[:-1]
+        tartuCardPAN = getPage(12)[11:] + getPage(16)[:-1]
         tartuCardType = getPage(4)[5:] + getPage(8)[:6]
 
-        print("\n************ CARD INFO **************")
+        print("\n************ CARD INFO **************\n")
         print("Card type: Tartu bus card")
         print("External type record: " + tartuCardType)
         print("Card ATR: " + ATR)
-        print("UID: " + tartuCardUID)
+        print("Card UID" + toHexString(send([0xFF, 0xCA, 0x00, 0x00, 0x00])))
+        print("PAN: " + tartuCardPAN)
 
 def main():
     if toHexString(current_card_ATR) == Classic1K_ATR:
